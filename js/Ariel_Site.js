@@ -139,3 +139,223 @@ function ClickThemes3()
 document.getElementById('theme1').addEventListener("click", ClickThemes);
 document.getElementById('theme2').addEventListener("click", ClickThemes2);
 document.getElementById('theme3').addEventListener("click", ClickThemes3);
+
+
+
+
+    var CANVAS_WIDTH = 640;//window.innerWidth;
+    var CANVAS_HEIGHT = 640;//window.innerHeight;
+
+    var FPS = 60;
+
+    // example code from mr doob : http://mrdoob.com/lab/javascript/requestanimationframe/
+    // var glob = 0;
+
+    var GameInfoTracker = {
+      num_keydowns: 0,
+      game_time: 0
+    };
+    var Bird = function() {
+      var obj = Object.create(Bird.prototype);
+      obj.x = 90;
+      obj.y = 10;
+      obj.t = 1;
+      obj.vert = 0;
+      obj.q = 1;
+      obj.z = 0;
+
+      // if(starting_point != null) { obj.placement = starting_point; }
+      // else { obj.placement = 0; }
+      obj.placement = 0;
+      obj.x = obj.x + obj.placement;
+      obj.speed = 20.0;
+
+      return obj;
+    };
+
+    Bird.prototype.proccessInput = function() {
+      if(this.t > 370) {this.y = 10; this.t = 1};
+      //  console.log(this.t);
+      var Bird_obj = this;
+      window.addEventListener("keydown", function(event) {
+        if(event.which == 83) {
+          //  console.log("key!!!");
+          //  glob = 1;
+           Bird_obj.vert = 1;
+          //  console.log(temp);
+         }
+         else if(event.which == 87) {
+           Bird_obj.vert = 2;
+         }
+         else if(event.which == 68) {
+           Bird_obj.z = 1;
+         }
+         else if(event.which == 65) {
+           Bird_obj.z = 2;
+         }
+      })
+    };
+
+    Bird.prototype.updatePosition = function() {
+                  // Create the astroid/meteor objects that move by themselves.
+      if(this.vert === 1) {
+        this.vert = 0;
+        glob = 0;
+        // time = new Date().getTime() * 0.002;
+        // console.log("time 1");
+        // console.log("this.speed");
+        this.t = this.t + this.speed;
+      }
+      else if (this.vert === 2) {
+        this.vert = 0;
+        this.t = this.t - this.speed;
+      }
+      if (this.z === 1) {
+        this.z = 0;
+        this.q = this.q + this.speed;
+      }
+      else if (this.z === 2){
+        this.z = 0;
+        this.q = this.q - this.speed;
+      }
+      // else if (timing()) {b1.y = b1.y + t; t = 1;}
+    };
+
+    Bird.prototype.move = function() {
+      ctx.beginPath();
+      // ctx.fillText("", 90, 10+t);
+      // ctx.clearRect(90, 10+t, 10, 10);
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      ctx.moveTo(10, 10);
+      ctx.lineTo(50, 50);
+      ctx.lineTo(50, 10);
+      ctx.lineTo(10, 10);
+      // ctx.stroke();
+      ctx.fillStyle = "blue";
+      ctx.fill();
+      ctx.fillText("V", this.x + this.q, this.y + this.t);
+      // console.log(this.t);
+      ctx.closePath();
+    };
+
+    var Ball = function() {
+      var obj = Object.create(Ball.prototype);
+      obj.x = 100;
+      obj.y = 100;
+      obj.speed = 3;
+      obj.direction = Math.PI * 2 * Math.random();
+
+      return obj;
+    }
+
+    Ball.prototype.move = function() {
+      // Draw over the whole canvas to create the trail effect
+      ctx.fillStyle = 'rgba(255, 255, 255, .05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the dot
+      ctx.beginPath();
+      ctx.fillStyle = '#ff0000';
+      ctx.moveTo(this.x, this.y);
+      ctx.arc(this.x, this.y, 3, 0, Math.PI*2, true);
+      ctx.fill();
+    }
+
+    Ball.prototype.updatePosition = function() {
+      var dx = this.x + this.speed * Math.cos(this.direction);
+      var dy = this.y + this.speed * Math.sin(this.direction);
+
+      if (dx < 0 || dx > CANVAS_WIDTH || dy < 0 || dy > CANVAS_HEIGHT) {
+        this.direction = Math.PI * 2 * Math.random();
+        this.updatePosition();
+      } else {
+        this.x = dx;
+        this.y = dy;
+      }
+    }
+
+
+// REMOVE THESE FROM THE GLOBAL SCOPE !!!!!S
+      var canvas, context;
+      init();
+
+      var b1 = Bird();
+      var ball1 = Ball();
+      var ball2 = Ball();
+      var ball3 = Ball();
+      var ball4 = Ball();
+      // var b2 = Bird(30);
+      animate();
+      function init() {
+          canvas = document.getElementById('canvas');
+          ctx = canvas.getContext( '2d' );
+          canvas.width = CANVAS_WIDTH;
+          canvas.height = CANVAS_HEIGHT;
+          createTrail();
+      }
+      function animate() {
+          requestAnimationFrame( animate );
+          b1.proccessInput();
+          // time = new Date().getTime() * 0.002;
+          b1.updatePosition();
+          // updatePositionBall();
+          ball1.updatePosition();
+          ball2.updatePosition();
+          ball3.updatePosition();
+          ball4.updatePosition();
+          b1.move();
+          ball1.move();
+          ball2.move();
+          ball3.move();
+          ball4.move();
+          // loop();
+      };
+
+
+      function timing() {
+        time2 = new Date().getTime() * 0.002;
+        // console.log("time 2");
+        // console.log(time2);
+        // console.log(time2 - time);
+        if ( (time2 - time) >= .0001 ) {
+
+          return true;
+        }
+        return false;
+      };
+
+      function createTrail() {
+        dot = {
+          x: 100,
+          y: 100,
+          speed: 3,
+          direction: Math.PI * 8 * Math.random()
+        }
+      }
+
+// <!--
+// // example code from mr doob : http://mrdoob.com/lab/javascript/requestanimationframe/
+// var canvas, context;
+// init();
+// animate();
+// function init() {
+//     canvas = getCanvas();
+//     context = canvas.getContext( '2d' );
+// }
+// function animate() {
+//     requestAnimationFrame( animate );
+//     draw();
+// }
+// function draw() {
+//     var time = new Date().getTime() * 0.002;
+//     var x = Math.sin( time ) * 96 + 38;
+//     var y = Math.cos( time * 0.9 ) * 96 + 38;
+//
+//     context.fillStyle = 'rgb(245,245,245)';
+//     context.fillRect( 0, 0, 255, 255 );
+//     context.fillStyle = 'rgb(255,0,0)';
+//     context.beginPath();
+//     context.arc( x, y, 10, 0, Math.PI * 2, true );
+//     context.closePath();
+//     context.fill();
+// } -->
