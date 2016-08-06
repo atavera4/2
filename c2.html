@@ -64,7 +64,7 @@
                   // Create the astroid/meteor objects that move by themselves.
       if(this.vert === 1) {
         GameProgressTracker.num_keydowns++;
-        console.log(GameProgressTracker.num_keydowns);
+        // console.log(GameProgressTracker.num_keydowns);
         this.vert = 0;
         // time = new Date().getTime() * 0.002;
         // console.log("time 1");
@@ -73,19 +73,19 @@
       }
       else if (this.vert === 2) {
         GameProgressTracker.num_keydowns++;
-        console.log(GameProgressTracker.num_keydowns);
+        // console.log(GameProgressTracker.num_keydowns);
         this.vert = 0;
         this.t = this.t - this.speed;
       }
       if (this.z === 1) {
         GameProgressTracker.num_keydowns++;
-        console.log(GameProgressTracker.num_keydowns);
+        // console.log(GameProgressTracker.num_keydowns);
         this.z = 0;
         this.q = this.q + this.speed;
       }
       else if (this.z === 2){
         GameProgressTracker.num_keydowns++;
-        console.log(GameProgressTracker.num_keydowns);
+        // console.log(GameProgressTracker.num_keydowns);
         this.z = 0;
         this.q = this.q - this.speed;
       }
@@ -150,12 +150,13 @@
       var canvas, context;
       init();
       var b1 = Bird();
+      var test = 0;
       //var ball1 = Ball();
       var balls = CreateBallArray();
       CreateNewBall();
       var array_size = balls.length;
 
-      animate();
+      // animate();
       function init() {
           canvas = document.getElementById('canvas');
           ctx = canvas.getContext( '2d' );
@@ -177,8 +178,8 @@
 
           b1.move();
           //  console.log(Math.abs(b1.t - ball1.y));
-          // if (Math.abs((b1.t+10) - ball1.y) <= 10) {
-          //   if(Math.abs((b1.q+90) - ball1.x) <= 10) {
+          // if (Math.abs((b1.t+10) - balls[0].y) <= 10) {
+          //   if(Math.abs((b1.q+90) - balls[0].x) <= 10) {
           //     console.log(b1.q);
           //     console.log("asdfdfgse");
           //   }
@@ -188,18 +189,48 @@
           // ball3.move();
           // ball4.move();
           MoveBalls();
-          if (GameProgressTracker.num_keydowns == 10) {
-            CreateNewBall();
-            GameProgressTracker.num_keydowns = 0;
-
-          }
+          console.log("new animation loop");
+          PlayerTouchBall();
+          // if (GameProgressTracker.num_keydowns == 10) {
+          //   CreateNewBall();
+          //   GameProgressTracker.num_keydowns = 0;
+          // }
           //
+          // b1.move();
           array_size = balls.length;
+
+          // put this into a function !!!!!!!!
+          if (test != 0) {
+            test++;
+          }
+          if (test == 4) { CreateNewBall(); test = 0; }
+
+
           // loop();
       };
 
       function PlayerTouchBall() {
+        var tempBird = 0;
+        var tempBall = 0;
+        for (var i=0; i < array_size; i++) {
+          if ( Math.abs( (b1.t + 10) - balls[i].y) <= 10 ) {
+            if( Math.abs( (b1.q + 90) - balls[i].x) <= 10 ) {
+              console.log("IT WORKS!!!!");
+              test = 1;
+              // this has to be buffered as well.
+              RemoveBall(i);
+              // CreateNewBall();
+              break;
+            }
+          }
+        }
+      }
 
+      // call this function from within the above function when player touches the ball.
+      // Use a shared variable as well.
+      function RemoveBall(ball_index) {
+          // splice the balls array here !!!!!!!!
+          balls.splice();
       }
 
 
