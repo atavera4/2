@@ -8,7 +8,6 @@
 
     var CANVAS_WIDTH = window.innerWidth;
     var CANVAS_HEIGHT = window.innerHeight;
-
     var FPS = 60;
 
     // example code from mr doob : http://mrdoob.com/lab/javascript/requestanimationframe/
@@ -16,13 +15,147 @@
 
     var GameProgressTracker = {
       num_keydowns: 0,
-      game_time: 0
+      game_time: 0,
+      game_over: false,
+      game_stop: 1
     };
+
+    var HealthBar = function() {
+      var obj = Object.create(HealthBar.prototype);
+      // The end coordinates for the bar.
+      obj.end_X = 10;
+      // The coordinates for each of the health bars 4 corners.
+      obj.TopLeftCorner_X = 10;
+      obj.TopLeftCorner_Y = 10;
+
+      obj.BottomLeftCorner_X = 10;
+      obj.BottomLeftCorner_Y = 30;
+
+      obj.TopRightCorner_X = 70;
+      obj.TopRightCorner_Y = 10;
+
+      obj.BottomRightCorner_X = 70;
+      obj.BottomRightCorner_Y = 30;
+
+      return obj;
+    }
+
+    HealthBar.prototype.Draw = function() {
+      ctx.beginPath();
+      ctx.fillStyle = "blue"
+      ctx.fillText("Health", 10, 8);
+
+      // Health bar outline container.
+      ctx.moveTo(10, 10);
+      ctx.lineTo(100, 10);
+      ctx.lineTo(100, 30);
+      ctx.lineTo(10, 30);
+      ctx.lineTo(10, 10);
+      // ctx.fillStyle = "red";
+      // ctx.fill()
+      ctx.stroke();
+      ctx.closePath();
+
+      ctx.beginPath();
+      ctx.moveTo(this.TopLeftCorner_X, this.TopLeftCorner_Y);
+      ctx.lineTo(this.TopRightCorner_X, this.TopRightCorner_Y);
+      ctx.lineTo(this.BottomRightCorner_X, this.BottomRightCorner_Y);
+      ctx.lineTo(this.BottomLeftCorner_X, this.BottomLeftCorner_Y);
+      ctx.lineTo(this.TopLeftCorner_X, this.TopLeftCorner_Y);
+      // ctx.fillStyle = "red";
+      ctx.fill();
+      // ctx.stroke();
+      ctx.closePath();
+    }
+
+    HealthBar.prototype.UpdateHealth = function(Up_or_Down) {
+      var health_amount = 5;
+      var health_decline = 20;
+      var health_increse = 5;
+      if (Up_or_Down == 1) {
+        this.TopRightCorner_X = this.TopRightCorner_X + health_amount;
+        // this.TopRightCorner_Y = this.TopRightCorner_Y + health_amount;
+        this.BottomRightCorner_X = this.BottomRightCorner_X + health_amount;
+        // this.BottomRightCorner_Y = this.BottomRightCorner_Y + health_amount;
+      }
+      else {
+        this.TopRightCorner_X = this.TopRightCorner_X - health_decline;
+        // this.TopRightCorner_Y = this.TopRightCorner_Y - health_amount;
+        this.BottomRightCorner_X = this.BottomRightCorner_X - health_decline;
+        // this.BottomRightCorner_Y = this.BottomRightCorner_Y - health_amount;
+      }
+
+      if (this.TopRightCorner_X <= this.end_X) {
+        console.log("here!!!!!!@");
+        // ResetGame();
+        GameProgressTracker.game_stop = 1;
+        GameProgressTracker.game_over = true;
+        return;
+      }
+    }
+
+    var SpeedBar = function() {
+      var obj = Object.create(SpeedBar.prototype);
+      // the coordinates for the speed bar.
+      obj.TopLeftCorner_X = 10;
+      obj.TopLeftCorner_Y = 45;
+
+      obj.BottomLeftCorner_X = 10;
+      obj.BottomLeftCorner_Y = 50;
+
+      obj.TopRightCorner_X = 100;
+      obj.TopRightCorner_Y = 45;
+
+      obj.BottomRightCorner_X = 100;
+      obj.BottomRightCorner_Y = 50;
+      return obj;
+    }
+
+    SpeedBar.prototype.Draw = function() {
+      ctx.beginPath();
+      ctx.fillStyle = "green";
+      ctx.fillText("Speed/energy bonus", 10, 42);
+
+      ctx.moveTo(this.TopLeftCorner_X, this.TopLeftCorner_Y);
+      ctx.lineTo(this.TopRightCorner_X, this.TopRightCorner_Y);
+      ctx.lineTo(this.BottomRightCorner_X, this.BottomRightCorner_Y);
+      ctx.lineTo(this.BottomLeftCorner_X, this.BottomLeftCorner_Y);
+      ctx.lineTo(this.TopLeftCorner_X, this.TopLeftCorner_Y);
+      ctx.stroke();
+      ctx.fill();
+
+    }
+
+    SpeedBar.prototype.UpdateSpeed = function(Up_or_Down) {
+      var speed_amount = 5;
+      var speed_decline = 10;
+      var speed_increase = 5;
+
+      if(this.TopRightCorner_X == 250) {
+        return;
+      }
+      if (Up_or_Down == 1) {
+        this.TopRightCorner_X = this.TopRightCorner_X + speed_amount;
+        // this.TopRightCorner_Y = this.TopRightCorner_Y + health_amount;
+        this.BottomRightCorner_X = this.BottomRightCorner_X + speed_amount;
+        // this.BottomRightCorner_Y = this.BottomRightCorner_Y + health_amount;
+      }
+      else {
+        this.TopRightCorner_X = this.TopRightCorner_X - speed_decline;
+        // this.TopRightCorner_Y = this.TopRightCorner_Y - health_amount;
+        this.BottomRightCorner_X = this.BottomRightCorner_X - speed_decline;
+        // this.BottomRightCorner_Y = this.BottomRightCorner_Y - health_amount;
+      }
+    }
+
+    var PlayerScore = function() {
+      var obj = Object.create(SpeedBar.prototype);
+    }
 
     var Bird = function() {
       var obj = Object.create(Bird.prototype);
-      obj.x = 90;
-      obj.y = 10;
+      obj.x = 150;
+      obj.y = 100;
       obj.t = 1;
       obj.vert = 0;
       obj.q = 1;
@@ -56,6 +189,9 @@
          }
          else if(event.which == 65) {
            Bird_obj.z = 2;
+         }
+         else if(event.which == 13 ) {
+           GameProgressTracker.game_stop = 2;
          }
       })
     };
@@ -97,11 +233,8 @@
       // ctx.fillText("", 90, 10+t);
       // ctx.clearRect(90, 10+t, 10, 10);
       ctx.clearRect(0,0, canvas.width, canvas.height);
-      ctx.moveTo(10, 10);
-      ctx.lineTo(50, 50);
-      ctx.lineTo(50, 10);
-      ctx.lineTo(10, 10);
-      // ctx.stroke();
+      // healthTracker.Draw();
+      // SpeedTracker.Draw();
       ctx.fillStyle = "blue";
       ctx.fill();
       ctx.fillText("V", this.x + this.q, this.y + this.t);
@@ -130,6 +263,7 @@
       ctx.moveTo(this.x, this.y);
       ctx.arc(this.x, this.y, 3, 0, Math.PI*2, true);
       ctx.fill();
+      ctx.closePath();
     }
 
     Ball.prototype.updatePosition = function() {
@@ -139,7 +273,42 @@
       if (dx < 0 || dx > CANVAS_WIDTH || dy < 0 || dy > CANVAS_HEIGHT) {
         this.direction = Math.PI * 2 * Math.random();
         this.updatePosition();
-      } else {
+      }
+      else {
+        this.x = dx;
+        this.y = dy;
+      }
+    }
+
+
+    var Rock = function() {
+      var obj = Object.create(Rock.prototype);
+      obj.x = 100;
+      obj.y = 100;
+      obj.speed = 6;
+      obj.direction = Math.PI * 2 * Math.random();
+
+      return obj;
+    }
+
+    Rock.prototype.move = function() {
+      ctx.beginPath();
+      ctx.fillStyle = "purple";
+      ctx.moveTo(this.x, this.y);
+      ctx.arc(this.x, this.y, 25, 0, Math.PI*2, true);
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    Rock.prototype.updatePosition = function() {
+      var dx = this.x + this.speed * Math.cos(this.direction);
+      var dy = this.y + this.speed * Math.sin(this.direction);
+
+      if (dx < 0 || dx > CANVAS_WIDTH || dy < 0 || dy > CANVAS_HEIGHT) {
+        this.direction = Math.PI * 2 * Math.random();
+        this.updatePosition();
+      }
+      else {
         this.x = dx;
         this.y = dy;
       }
@@ -149,14 +318,25 @@
 // REMOVE THESE FROM THE GLOBAL SCOPE !!!!!S
       var canvas, context;
       init();
+      // var stop = 1;
       var b1 = Bird();
       var test = 0;
       //var ball1 = Ball();
+      var healthTracker = HealthBar();
+      var SpeedTracker = SpeedBar();
       var balls = CreateBallArray();
+      var Rocks = CreateRockArray();
       CreateNewBall();
+      CreateNewBall();
+      CreateNewBall();
+      CreateNewBall();
+      CreateNewRock();
       var array_size = balls.length;
+      var rock_array_length = Rocks.length;
 
-      // animate();
+      animate();
+
+
       function init() {
           canvas = document.getElementById('canvas');
           ctx = canvas.getContext( '2d' );
@@ -168,57 +348,44 @@
           requestAnimationFrame( animate );
           b1.proccessInput();
           // time = new Date().getTime() * 0.002;
-          b1.updatePosition();
-          // updatePositionBall();
-          // ball1.updatePosition();
-          // ball2.updatePosition();
-          // ball3.updatePosition();
-          // ball4.updatePosition();
-          UpdateBallPositions();
+          if (GameProgressTracker.game_stop == 0) {
+            b1.updatePosition();
+            UpdateBallPositions();
+            UpdateRockPositions();
 
-          b1.move();
-          //  console.log(Math.abs(b1.t - ball1.y));
-          // if (Math.abs((b1.t+10) - balls[0].y) <= 10) {
-          //   if(Math.abs((b1.q+90) - balls[0].x) <= 10) {
-          //     console.log(b1.q);
-          //     console.log("asdfdfgse");
-          //   }
-          // }
-          // ball1.move();
-          // ball2.move();
-          // ball3.move();
-          // ball4.move();
-          MoveBalls();
-          console.log("new animation loop");
-          PlayerTouchBall();
-          // if (GameProgressTracker.num_keydowns == 10) {
-          //   CreateNewBall();
-          //   GameProgressTracker.num_keydowns = 0;
-          // }
-          //
-          // b1.move();
-          array_size = balls.length;
+            b1.move();
+            healthTracker.Draw();
+            SpeedTracker.Draw();
+            MoveBalls();
+            MoveRocks();
+            // console.log("new animation loop");
+            PlayerTouchBall();
+            PlayerTouchRock();
 
-          // put this into a function !!!!!!!!
-          if (test != 0) {
-            test++;
+            array_size = balls.length;
+            rock_array_length = Rocks.length;
           }
-          if (test == 4) { CreateNewBall(); test = 0; }
-
-
-          // loop();
+          else if (GameProgressTracker.game_stop == 1) {
+              StartGame();
+          }
+          else {
+            ResetGame();
+            GameProgressTracker.game_stop = 0;
+            GameProgressTracker.game_over = false;
+          }
       };
 
       function PlayerTouchBall() {
-        var tempBird = 0;
-        var tempBall = 0;
         for (var i=0; i < array_size; i++) {
-          if ( Math.abs( (b1.t + 10) - balls[i].y) <= 10 ) {
-            if( Math.abs( (b1.q + 90) - balls[i].x) <= 10 ) {
+          if ( Math.abs( (b1.t + b1.y) - balls[i].y ) <= 10 ) {
+            if( Math.abs( (b1.q + b1.x) - balls[i].x) <= 10 ) {
               console.log("IT WORKS!!!!");
               test = 1;
               // this has to be buffered as well.
               RemoveBall(i);
+              b1.speed = b1.speed + 5;
+              healthTracker.UpdateHealth(1);
+              SpeedTracker.UpdateSpeed(1);
               // CreateNewBall();
               break;
             }
@@ -230,7 +397,7 @@
       // Use a shared variable as well.
       function RemoveBall(ball_index) {
           // splice the balls array here !!!!!!!!
-          balls.splice();
+          balls.splice(ball_index,1);
       }
 
 
@@ -252,8 +419,8 @@
       }
 
       function CreateNewBall() {
-         var b = Ball();
-         balls.push(b);
+         var ball = Ball();
+         balls.push(ball);
       }
 
       function UpdateBallPositions() {
@@ -269,11 +436,82 @@
         }
       }
 
+      function CreateRockArray() {
+        var obj_array = [];
+        return obj_array;
+      }
+
+      function CreateNewRock() {
+        var rock = Rock();
+        Rocks.push(rock);
+      }
+
+      function UpdateRockPositions() {
+        for (var i=0; i < rock_array_length; i++) {
+          Rocks[i].updatePosition();
+        }
+      }
+
+      function MoveRocks() {
+        for (var i=0; i < rock_array_length; i++) {
+          Rocks[i].move();
+        }
+      }
+
+      function PlayerTouchRock() {
+        for (var i=0; i < rock_array_length; i++ ) {
+          if ( Math.abs( (b1.t + 100) - Rocks[i].y ) <= 22 ) {
+            if (Math.abs( ( b1.q + 150) - Rocks[i].x) <= 22) {
+              test2 = 2;
+              RemoveRock(i);
+              b1.speed = 10;
+              healthTracker.UpdateHealth(0);
+              SpeedTracker.UpdateSpeed(0);
+              break;
+            }
+          }
+        }
+      }
+
+      function RemoveRock(rock_index) {
+        Rocks.splice(rock_index, 1);
+      }
+
+
+
+      function ResetGame() {
+        // if (GameProgressTracker.game_over == true) {
+          SpeedTracker = SpeedBar();
+          healthTracker = HealthBar();
+          balls = CreateBallArray();
+          CreateNewBall();
+          CreateNewBall();
+          CreateNewBall();
+          CreateNewBall();
+          Rocks = CreateRockArray();
+          CreateNewRock();
+          console.log("here");
+          // GameProgressTracker.game_over = false;
+        // }
+      }
+
+      function StartGame() {
+        ctx.beginPath();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (GameProgressTracker.game_over == true) {
+          ctx.fillStyle = "red";
+          ctx.fillText("Game Over !!!!!", canvas.width/2 - 100, canvas.height/2);
+        }
+        ctx.fillStyle = "blue";
+        ctx.fillText("press enter key to restart Game", (canvas.width/2 - 100), (canvas.height/2) + 20);
+      }
+
+
     </script>
   </body>
 </html>
 
-// <!--
+ <!--
 // // example code from mr doob : http://mrdoob.com/lab/javascript/requestanimationframe/
 // var canvas, context;
 // init();
