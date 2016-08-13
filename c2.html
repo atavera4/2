@@ -16,6 +16,7 @@
     var GameProgressTracker = {
       num_keydowns: 0,
       game_time: 0,
+      game_init: true,
       game_over: false,
       game_stop: 1,
       red_balls: 0,
@@ -94,6 +95,7 @@
         // ResetGame();
         GameProgressTracker.game_stop = 1;
         GameProgressTracker.game_over = true;
+        GameProgressTracker.game_init = true;
         return;
       }
     }
@@ -107,10 +109,10 @@
       obj.BottomLeftCorner_X = 10;
       obj.BottomLeftCorner_Y = 50;
 
-      obj.TopRightCorner_X = 10;
+      obj.TopRightCorner_X = 35;
       obj.TopRightCorner_Y = 45;
 
-      obj.BottomRightCorner_X = 10;
+      obj.BottomRightCorner_X = 35;
       obj.BottomRightCorner_Y = 50;
       return obj;
     }
@@ -131,13 +133,19 @@
     }
 
     SpeedBar.prototype.UpdateSpeed = function(Up_or_Down) {
-      var speed_amount = 5;
+      var speed_amount = 10;
       var speed_decline = 10;
-      var speed_increase = 5;
+      var speed_increase = 10;
 
-      if(this.TopRightCorner_X == 200) {
+      if(this.TopRightCorner_X >= 200) {
         return;
       }
+      if(this.TopRightCorner_X <= 10 ) {
+        this.TopRightCorner_X = 10;
+        this.BottomRightCorner_X = 10;
+        return;
+      }
+
       if (Up_or_Down == 1) {
         this.TopRightCorner_X = this.TopRightCorner_X + speed_amount;
         // this.TopRightCorner_Y = this.TopRightCorner_Y + health_amount;
@@ -222,8 +230,22 @@
            Bird_obj.z = 2;
          }
          else if(event.which == 13 ) {
-           GameProgressTracker.game_stop = 2;
+           if (GameProgressTracker.game_init == true) {
+             GameProgressTracker.game_stop = 2;
+            //  GameProgressTracker.game_init == false;
+           }
          }
+
+        //  switch(event.which) {
+        //   case 83:
+        //     Bird_obj.vert = 1;
+        //   case 87:
+        //     Bird_obj.vert = 2;
+        //   case 68:
+        //     Bird_obj.z = 1;
+        //   case 65:
+        //     Bird_obj.z = 2;
+        //  }
       })
     };
 
@@ -238,7 +260,7 @@
         // console.log("this.speed");
         this.t = this.t + this.speed;
       }
-      else if (this.vert === 2) {
+      if (this.vert === 2) {
         GameProgressTracker.num_keydowns++;
         // console.log(GameProgressTracker.num_keydowns);
         this.vert = 0;
@@ -250,7 +272,7 @@
         this.z = 0;
         this.q = this.q + this.speed;
       }
-      else if (this.z === 2){
+      if (this.z === 2){
         GameProgressTracker.num_keydowns++;
         // console.log(GameProgressTracker.num_keydowns);
         this.z = 0;
@@ -275,8 +297,8 @@
 
     var RedBall = function() {
       var obj = Object.create(RedBall.prototype);
-      obj.x = 100;
-      obj.y = 100;
+      obj.dx = 100;
+      obj.dy = 100;
       obj.speed = 3;
       obj.direction = Math.PI * 2 * Math.random();
       return obj;
@@ -289,23 +311,23 @@
       // Draw the dot
       ctx.beginPath();
       ctx.fillStyle = '#ff0000';
-      ctx.moveTo(this.x, this.y);
-      ctx.arc(this.x, this.y, 10, 0, Math.PI*2, true);
+      ctx.moveTo(this.dx, this.dy);
+      ctx.arc(this.dx, this.dy, 10, 0, Math.PI*2, true);
       ctx.fill();
       ctx.closePath();
     }
 
     RedBall.prototype.UpdatePosition = function() {
-      var dx = this.x + this.speed * Math.cos(this.direction);
-      var dy = this.y + this.speed * Math.sin(this.direction);
+      var dx = this.dx + this.speed * Math.cos(this.direction);
+      var dy = this.dy + this.speed * Math.sin(this.direction);
 
       if (dx < 0 || dx > CANVAS_WIDTH || dy < 0 || dy > CANVAS_HEIGHT) {
         this.direction = Math.PI * 2 * Math.random();
         this.UpdatePosition();
       }
       else {
-        this.x = dx;
-        this.y = dy;
+        this.dx = dx;
+        this.dy = dy;
       }
       // console.log("IT WORKS red!!!!");
     }
@@ -324,7 +346,7 @@
       ctx.beginPath();
       ctx.fillStyle = "green";
       ctx.moveTo(this.dx, this.dy);
-      ctx.arc(this.dx, this.dy, 10, 0, Math.PI*2, true);
+      ctx.arc(this.dx, this.dy, 5, 0, Math.PI*2, true);
       ctx.fill();
       ctx.closePath();
     }
@@ -420,8 +442,10 @@
             MoveBalls("red", RedBalls, RedBall_array_size);
             MoveBalls("green", GreenBalls, GreenBall_array_size);
             MoveRocks();
+
             // console.log("new animation loop");
-            PlayerTouchRedBall();
+            PlayerTouchBall("red", RedBalls, RedBall_array_size);
+            PlayerTouchBall("green", GreenBalls, GreenBall_array_size);
             PlayerTouchRock();
 
             RedBall_array_size = RedBalls.length;
@@ -435,38 +459,49 @@
             ResetGame();
             GameProgressTracker.game_stop = 0;
             GameProgressTracker.game_over = false;
+            GameProgressTracker.game_init = false;
           }
       };
 
-      function PlayerTouchRedBall() {
-        for (var i=0; i < RedBall_array_size; i++) {
-          if ( Math.abs( (b1.t + b1.y) - RedBalls[i].y ) <= 10 ) {
-            if( Math.abs( (b1.q + b1.x) - RedBalls[i].x) <= 10 ) {
-              // console.log("IT WORKS!!!!");
-              // this has to be buffered as well.
-              // RemoveRedBall(i);
-              RemoveBall("red", RedBalls, i);
-              b1.speed = b1.speed + 5;
-              healthTracker.UpdateHealth(1);
-              SpeedTracker.UpdateSpeed(1);
-              Score.UpdateScore(0);
-              // CreateNewBall();
-              break;
+
+      function PlayerTouchBall(ball_color, ball_array, array_size) {
+
+
+        for (var i=0; i < array_size; i++ ) {
+          // This is a temporary fix to an issue that occures sometimes only.
+          if (ball_array[i] == null) {
+            console.log("ball array empty");
+            return;
+          }
+          if (Math.abs( (b1.t + b1.y) - ball_array[i].dy ) <= 20) {
+            if (Math.abs( (b1.q + b1.x) - ball_array[i].dx) <= 20) {
+              RemoveBall(ball_color, ball_array, i);
+
+              switch(ball_color) {
+                case "red":
+                  // b1.speed = b1.speed + 5;
+                  healthTracker.UpdateHealth(1);
+                  // SpeedTracker.UpdateSpeed(1);
+                  Score.UpdateScore(0);
+                  break;
+                case "green":
+                  b1.speed = b1.speed + 5;
+                  // healthTracker.UpdateHealth(1);
+                  SpeedTracker.UpdateSpeed(1);
+                  Score.UpdateScore(0);
+                  break;
+                default:
+                  b1.speed = b1.speed + 5;
+                  healthTracker.UpdateHealth(1);
+                  SpeedTracker.UpdateSpeed(1);
+                  Score.UpdateScore(0);
+                  break;
+              }
             }
           }
         }
       }
 
-      // call this function from within the above function when player touches the ball.
-      // Use a shared variable as well.
-      function RemoveRedBall(ball_index) {
-          // splice the balls array here !!!!!!!!
-          RedBalls.splice(ball_index,1);
-      }
-
-      function RemoveAllRedBalls() {
-        RedBalls.splice(0, RedBall_array_size);
-      }
 
       function RemoveAllBalls(ball_array, array_size) {
         ball_array.splice(0, array_size);
@@ -501,13 +536,6 @@
         return false;
       };
 
-
-      function UpdateRedBallPositions() {
-        for (var i=0; i < RedBall_array_size; i++) {
-          // console.log(balls[i]);
-          RedBalls[i].UpdatePosition();
-        }
-      }
 
       function UpdateBallPositions(ball_color, ball_array, array_size) {
         switch(ball_color) {
@@ -616,16 +644,29 @@
         SpeedTracker = SpeedBar();
         healthTracker = HealthBar();
 
-        RemoveAllRedBalls();
+        RemoveAllBalls(RedBalls, RedBall_array_size);
+        RedBalls = CreateBallArray();
+        RemoveAllBalls(GreenBalls, GreenBall_array_size);
+        GreenBalls = CreateBallArray();
         CreateNewBall("red", RedBalls);
-        // CreateNewBall("red", RedBalls);
-        // CreateNewBall("red", RedBalls);
-        // CreateNewBall("red", RedBalls);
+        CreateNewBall("red", RedBalls);
+        CreateNewBall("red", RedBalls);
+
         CreateNewBall("green", GreenBalls);
+        CreateNewBall("green", GreenBalls);
+
         RemoveAllRocks();
+        Rocks = CreateRockArray();
         CreateNewRock();
         CreateNewRock();
+        CreateNewRock();
+        CreateNewRock();
+
         // console.log("here");
+        RedBall_array_size = RedBalls.length;
+        GreenBall_array_size = GreenBalls.length;
+        rock_array_length = Rocks.length;
+
       }
 
       function StartGame() {
@@ -645,30 +686,3 @@
     </script>
   </body>
 </html>
-
- <!--
-// // example code from mr doob : http://mrdoob.com/lab/javascript/requestanimationframe/
-// var canvas, context;
-// init();
-// animate();
-// function init() {
-//     canvas = getCanvas();
-//     context = canvas.getContext( '2d' );
-// }
-// function animate() {
-//     requestAnimationFrame( animate );
-//     draw();
-// }
-// function draw() {
-//     var time = new Date().getTime() * 0.002;
-//     var x = Math.sin( time ) * 96 + 38;
-//     var y = Math.cos( time * 0.9 ) * 96 + 38;
-//
-//     context.fillStyle = 'rgb(245,245,245)';
-//     context.fillRect( 0, 0, 255, 255 );
-//     context.fillStyle = 'rgb(255,0,0)';
-//     context.beginPath();
-//     context.arc( x, y, 10, 0, Math.PI * 2, true );
-//     context.closePath();
-//     context.fill();
-// } -->
