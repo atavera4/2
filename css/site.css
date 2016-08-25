@@ -13,6 +13,7 @@ body {
   background-repeat: no-repeat;*/
 }
 
+
 .marquee {
   -webkit-marquee: up 3px infinite scroll normal;
   marquee-direction: left;

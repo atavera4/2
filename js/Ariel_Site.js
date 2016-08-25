@@ -136,9 +136,28 @@ function ClickThemes3()
   document.getElementById("BodyBG").className = "BodyBackground3";
 }
 
+
+function OpenSummer2015()
+{
+  window.open("Operating Systems Projects.html");
+}
+
+function OpenFall2015()
+{
+  window.open("Operating Systems Projects.html");
+}
+
 document.getElementById('theme1').addEventListener("click", ClickThemes);
 document.getElementById('theme2').addEventListener("click", ClickThemes2);
 document.getElementById('theme3').addEventListener("click", ClickThemes3);
+
+document.getElementById('Summer2015').addEventListener("click", OpenSummer2015);
+document.getElementById('Fall2015').addEventListener("click", OpenFall2015);
+// document.getElementById('Spring2016').addEventListener("click", OpenSpring2016);
+// document.getElementById('Summer2016').addEventListener("click", OpenSummer2016);
+
+
+
 
 
 
