@@ -136,6 +136,10 @@ function ClickThemes3()
   document.getElementById("BodyBG").className = "BodyBackground3";
 }
 
+function OpenHomePage()
+{
+  window.open
+}
 
 function OpenSummer2015()
 {
@@ -144,22 +148,39 @@ function OpenSummer2015()
 
 function OpenFall2015()
 {
-  window.open("Operating Systems Projects.html");
+  window.open("Fall2015.html");
+}
+
+
+function OpenOSproject2() {
+  window.open("Operating Systems Project 2.html");
+}
+
+function OpenOSproject3() {
+  window.open("Operating Systems Project 3.html");
+}
+
+function OpenOSproject4() {
+  window.open("Operating Systems Project 4.html");
+}
+
+function OpenMicroProject() {
+  window.open("Microprocessors Project.html");
 }
 
 document.getElementById('theme1').addEventListener("click", ClickThemes);
 document.getElementById('theme2').addEventListener("click", ClickThemes2);
 document.getElementById('theme3').addEventListener("click", ClickThemes3);
 
-document.getElementById('Summer2015').addEventListener("click", OpenSummer2015);
-document.getElementById('Fall2015').addEventListener("click", OpenFall2015);
-// document.getElementById('Spring2016').addEventListener("click", OpenSpring2016);
-// document.getElementById('Summer2016').addEventListener("click", OpenSummer2016);
+
+function showCode() {
+  document.getElementById('code_block_1').toggle();
+}
+
+// document.getElementById('button1').addEventListener("click", showCode);
 
 
-
-
-
+// The code below is the game
 
 
     var CANVAS_WIDTH = 640;//window.innerWidth;

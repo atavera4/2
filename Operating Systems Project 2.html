@@ -11,21 +11,36 @@
 
 </head>
 
-<body class="BodyBackground1" onload="prettyPrint()">
-  <div id="Main" class="container TransparentBackgroundBlack ">
-  <p>
-    This is the second project done for the Operating systems course.
-    the objective here was to learn the use of the concepts:
-    mutual exclusion, multi-threaded programming, semaphores,
-    mutexes and their effect on program throughput by allowing
-    overlapping of I/O with CPU processing.
+<body class="BodyBackground1 " onload="prettyPrint()">
+  <div id="Main" class="container TransparentBackgroundBlack">
+  <div class="Description-font">
+    <p>
+      <pre>
 
-    The following C++ code is the program that I wrote to complete the task.
-    It uses a circular (bounded) buffer with semaphores. The semaphores
-    were created using the 'semaphore' and 'pthreads' library in order to maintain code
-    compatibility for both windows and linux systems.
+        This is the 2nd project done for the Operating systems course.
+        The objective here was to learn the use of the concepts:
+        mutual exclusion, multi-threaded programming, semaphores,
+        mutexes and their effect on program throughput by allowing
+        overlapping of I/O with CPU processing.
 
-  </p>
+        The following C++ code is the program that I wrote to complete the task.
+        It uses a circular (bounded) buffer with semaphores. The semaphores and threads
+        were created using the 'semaphore' and 'pthreads' library in order to maintain code
+        compatibility for both windows and linux systems.
+
+        There are two threads:
+        	One thread that
+            (1)	reads a line of the file into a 'buffer-slot' (the 'buffer' is a 'circular' array with fixed size = 10 slots).
+                Each subscript element of the buffer will hold one 'line' of the file.
+            (2)	when 'end of file' is detected, puts a 'special code' in the buffer
+            (3)	continues reading until the buffer is full or waits for an indication that there is space in the buffer, then continues reading
+          Another thread that:
+            (1)	gets a line from a buffer slot and writes the line to a 2nd file
+            (2)	exits when the special code is in the buffer.
+            (3)	repeats the previous steps (a, b) as long as there is data in the buffer, waits if the buffer is empty
+      </pre>
+    </p>
+  </div>
 
   <pre class="prettyprint" id="quine" style="border:4px solid #88c"><code>
     //
